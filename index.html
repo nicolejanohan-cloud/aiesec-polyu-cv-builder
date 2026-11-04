@@ -1,0 +1,951 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>[AIESEC in PolyU] Global Exchange CV Builder</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=EB+Garamond:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#fff0f5',
+              100: '#ffdde8',
+              200: '#f6bacb',
+              300: '#f194af',
+              400: '#ed7a9b',
+              500: '#d95277',
+              600: '#b83459',
+            },
+            matcha: {
+              100: '#f0f6eb',
+              200: '#e4eedd',
+              300: '#b8d0a3',
+              400: '#94b775',
+              500: '#7ba05b',
+              700: '#4e6d34',
+            },
+            butter: {
+              100: '#fffdf0',
+              200: '#fdf6b5',
+              300: '#fce885',
+              400: '#f3d346',
+            }
+          },
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            cv: ['Times New Roman', 'Times', 'EB Garamond', 'Georgia', 'serif'],
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    /* Print Formatting for standard A4 exact academic CV layout */
+    @media print {
+      body * {
+        visibility: hidden !important;
+      }
+      #printable-cv-wrapper, #printable-cv-wrapper * {
+        visibility: visible !important;
+      }
+      #printable-cv-wrapper {
+        position: absolute !important;
+        left: 0 !important;
+        top: 0 !important;
+        width: 100% !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        box-shadow: none !important;
+        border: none !important;
+        background: white !important;
+      }
+      @page {
+        size: A4 portrait;
+        margin: 1.2cm 1.5cm;
+      }
+      .no-print {
+        display: none !important;
+      }
+    }
+
+    /* CV Document Styling */
+    .cv-document {
+      font-family: 'Times New Roman', 'Times', 'Georgia', serif;
+      line-height: 1.35;
+      color: #0d0d0d;
+      background: #ffffff;
+    }
+    .cv-section-title {
+      font-size: 11pt;
+      font-weight: bold;
+      letter-spacing: 0.8px;
+      border-bottom: 1.5px solid #111111;
+      padding-bottom: 2px;
+      margin-top: 14px;
+      margin-bottom: 6px;
+      text-transform: uppercase;
+    }
+    .cv-bullet-list {
+      list-style-type: disc;
+      padding-left: 18px;
+      margin-top: 3px;
+      margin-bottom: 4px;
+    }
+    .cv-bullet-list li {
+      margin-bottom: 2.5px;
+      font-size: 10pt;
+    }
+
+    /* Editable Inline Fields */
+    [contenteditable="true"]:hover {
+      background-color: #fffde8;
+      outline: 1px dashed #ed7a9b;
+      border-radius: 2px;
+    }
+    [contenteditable="true"]:focus {
+      background-color: #ffffff;
+      outline: 2px solid #ed7a9b;
+      border-radius: 2px;
+    }
+
+    /* Scrollbars */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #f1f5f9;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #94a3b8;
+    }
+  </style>
+</head>
+<body class="bg-slate-100 text-slate-800 min-h-screen flex flex-col font-sans antialiased selection:bg-brand-100 selection:text-brand-600">
+
+  <!-- Top App Header -->
+  <header class="bg-gradient-to-r from-brand-400 via-brand-300 to-matcha-300 text-white shadow-md sticky top-0 z-30">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      <div class="flex items-center space-x-3">
+        <div class="bg-white/20 p-2 rounded-xl backdrop-blur-md flex items-center justify-center text-white">
+          <i class="fa-solid fa-graduation-cap text-xl"></i>
+        </div>
+        <div>
+          <h1 class="font-bold text-base sm:text-xl tracking-tight text-slate-900 drop-shadow-sm">[AIESEC in PolyU] Global Exchange CV Builder</h1>
+          <p class="text-[11px] sm:text-xs text-slate-800 font-medium">Automatic Response Parser & Professional CV Generator</p>
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="flex items-center space-x-2">
+        <button onclick="loadDefaultJohnResponse()" class="bg-matcha-500 hover:bg-matcha-700 text-white text-xs font-semibold px-3 py-2 rounded-lg transition-all shadow-sm flex items-center gap-1.5">
+          <i class="fa-solid fa-arrow-rotate-left"></i>
+          <span class="hidden sm:inline">Reset Sample Response</span>
+        </button>
+        <button onclick="window.print()" class="bg-white text-brand-600 hover:bg-brand-50 text-xs font-bold px-3.5 py-2 rounded-lg transition-all shadow-sm flex items-center gap-1.5">
+          <i class="fa-solid fa-file-pdf"></i>
+          <span>Print / Export PDF</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Toolbar / Status Bar -->
+  <div class="bg-white border-b border-slate-200 shadow-sm sticky top-16 z-20">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-14 flex items-center justify-between flex-wrap gap-2">
+      
+      <!-- Applicant Switcher -->
+      <div class="flex items-center space-x-3">
+        <span class="text-xs font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1">
+          <i class="fa-solid fa-users text-brand-400"></i> Applicant Responses:
+        </span>
+        <select id="applicant-selector" onchange="switchApplicant(this.value)" class="text-xs font-semibold bg-brand-50 text-brand-600 border border-brand-200 rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-brand-400 max-w-[220px] sm:max-w-xs truncate">
+          <option value="0">1. TAN Wei Ming, John</option>
+        </select>
+        <span id="response-count-badge" class="bg-matcha-100 text-matcha-700 text-[11px] font-extrabold px-2 py-0.5 rounded-full">
+          1 Loaded
+        </span>
+      </div>
+
+      <!-- Quick Actions -->
+      <div class="flex items-center space-x-2">
+        <button onclick="toggleImportModal()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold px-3 py-1.5 rounded-lg transition-all flex items-center gap-1.5">
+          <i class="fa-solid fa-file-csv text-matcha-500"></i>
+          <span>Import Form CSV / Copy-Paste</span>
+        </button>
+        <button onclick="addNewBlankApplicant()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold px-3 py-1.5 rounded-lg transition-all flex items-center gap-1.5">
+          <i class="fa-solid fa-user-plus text-brand-400"></i>
+          <span>New Applicant</span>
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Main Dual-Pane Workspace -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex-1 w-full grid grid-cols-1 lg:grid-cols-12 gap-6">
+    
+    <!-- LEFT PANE: EDITABLE FORM CONTROLS (Col 5) -->
+    <section class="lg:col-span-5 space-y-4 no-print">
+      <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-5 space-y-5">
+        <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+          <div class="flex items-center space-x-2">
+            <div class="w-8 h-8 rounded-lg bg-brand-100 text-brand-600 flex items-center justify-center font-bold text-sm">
+              <i class="fa-solid fa-sliders"></i>
+            </div>
+            <div>
+              <h2 class="text-sm font-bold text-slate-800">Form Response Data</h2>
+              <p class="text-[11px] text-slate-400">Edits automatically update the CV live</p>
+            </div>
+          </div>
+          <button onclick="saveCurrentFormValues()" class="bg-matcha-500 hover:bg-matcha-700 text-white text-xs font-bold px-3 py-1.5 rounded-lg transition-all shadow-sm flex items-center gap-1">
+            <i class="fa-solid fa-rotate"></i> Refresh CV
+          </button>
+        </div>
+
+        <form id="response-edit-form" onsubmit="event.preventDefault(); saveCurrentFormValues();" class="space-y-4 max-h-[72vh] overflow-y-auto pr-2">
+          
+          <!-- Personal Details -->
+          <div class="space-y-2">
+            <h3 class="text-xs font-bold text-brand-500 uppercase tracking-wider flex items-center gap-1.5">
+              <i class="fa-solid fa-id-card"></i> Personal Information
+            </h3>
+            <div class="grid grid-cols-1 gap-2.5">
+              <div>
+                <label class="block text-[11px] font-semibold text-slate-600 mb-0.5">Full Name (Passport Exact)</label>
+                <input type="text" id="input-fullName" oninput="saveCurrentFormValues()" class="w-full text-xs border border-slate-200 rounded-lg p-2 focus:ring-2 focus:ring-brand-400 focus:outline-none">
+              </div>
+              <div class="grid grid-cols-2 gap-2">
+                <div>
+                  <label class="block text-[11px] font-semibold text-slate-600 mb-0.5">District / City</label>
+                  <input type="text" id="input-district" oninput="saveCurrentFormValues()" class="w-full text-xs border border-slate-200 rounded-lg p-2 focus:ring-2 focus:ring-brand-400 focus:outline-none">
+                </div>
+                <div>
+                  <label class="block text-[11px] font-semibold text-slate-600 mb-0.5">Contact Number</label>
+                  <input type="text" id="input-phone" oninput="saveCurrentFormValues()" class="w-full text-xs border border-slate-200 rounded-lg p-2 focus:ring-2 focus:ring-brand-400 focus:outline-none">
+                </div>
+              </div>
+              <div class="grid grid-cols-2 gap-2">
+                <div>
+                  <label class="block text-[11px] font-semibold text-slate-600 mb-0.5">Personal Email</label>
+                  <input type="text" id="input-email" oninput="saveCurrentFormValues()" class="w-full text-xs border border-slate-200 rounded-lg p-2 focus:ring-2 focus:ring-brand-400 focus:outline-none">
+                </div>
+                <div>
+                  <label class="block text-[11px] font-semibold text-slate-600 mb-0.5">LinkedIn Profile URL</label>
+                  <input type="text" id="input-linkedin" oninput="saveCurrentFormValues()" class="w-full text-xs border border-slate-200 rounded-lg p-2 focus:ring-2 focus:ring-brand-400 focus:outline-none">
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Academic Background -->
+          <div class="space-y-2 pt-2 border-t border-slate-100">
+            <h3 class="text-xs font-bold text-brand-500 uppercase tracking-wider flex items-center gap-1.5">
+              <i class="fa-solid fa-graduation-cap"></i> Academic Background
+            </h3>
+            
+            <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 space-y-2">
+              <span class="text-[11px] font-bold text-slate-700">University Details</span>
+              <div>
+                <label class="block text-[10px] text-slate-500">University Name & Location</label>
+                <input type="text" id="input-uniName" oninput="saveCurrentFormValues()" class="w-full text-xs border border-slate-200 rounded-lg p-1.5 bg-white">
+              </div>
+              <div class="grid grid-cols-2 gap-2">
+                <div>
+                  <label class="block text-[10px] text-slate-500">Duration / Expected Grad</label>
+                  <input type="text" id="input-uniDuration" oninput="saveCurrentFormValues()" class="w-full text-xs border border-slate-200 rounded-lg p-1.5 bg-white">
+                </div>
+                <div>
+                  <label class="block text-[10px] text-slate-500">Major & Department</label>
+                  <input type="text" id="input-uniMajor" oninput="saveCurrentFormValues()" class="w-full text-xs border border-slate-200 rounded-lg p-1.5 bg-white">
+                </div>
+              </div>
+              <div>
+                <label class="block text-[10px] text-slate-500">Relevant Coursework / Academic Focus</label>
+                <textarea id="input-uniCoursework" oninput="saveCurrentFormValues()" rows="2" class="w-full text-xs border border-slate-200 rounded-lg p-1.5 bg-white resize-none"></textarea>
+              </div>
+              <div class="grid grid-cols-2 gap-2">
+                <div>
+                  <label class="block text-[10px] text-slate-500">University Achievements</label>
+                  <input type="text" id="input-uniAchievements" oninput="saveCurrentFormValues()" class="w-full text-xs border border-slate-200 rounded-lg p-1.5 bg-white">
+                </div>
+                <div>
+                  <label class="block text-[10px] text-slate-500">University Activities</label>
+                  <input type="text" id="input-uniActivities" oninput="saveCurrentFormValues()" class="w-full text-xs border border-slate-200 rounded-lg p-1.5 bg-white">
+                </div>
+              </div>
+            </div>
+
+            <!-- High School -->
+            <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 space-y-2">
+              <span class="text-[11px] font-bold text-slate-700">High School Details</span>
+              <div class="grid grid-cols-2 gap-2">
+                <div>
+                  <label class="block text-[10px] text-slate-500">High School Name & Location</label>
+                  <input type="text" id="input-hsName" oninput="saveCurrentFormValues()" class="w-full text-xs border border-slate-200 rounded-lg p-1.5 bg-white">
+                </div>
+                <div>
+                  <label class="block text-[10px] text-slate-500">Qualification (e.g. HKDSE / IB)</label>
+                  <input type="text" id="input-hsQualification" oninput="saveCurrentFormValues()" class="w-full text-xs border border-slate-200 rounded-lg p-1.5 bg-white">
+                </div>
+              </div>
+              <div>
+                <label class="block text-[10px] text-slate-500">High School Achievements & Activities</label>
+                <input type="text" id="input-hsAchievements" oninput="saveCurrentFormValues()" class="w-full text-xs border border-slate-200 rounded-lg p-1.5 bg-white">
+              </div>
+            </div>
+
+            <!-- Other Education -->
+            <div>
+              <label class="block text-[11px] font-semibold text-slate-600 mb-0.5">Other Education (Exchange / Masters)</label>
+              <input type="text" id="input-otherEducation" oninput="saveCurrentFormValues()" class="w-full text-xs border border-slate-200 rounded-lg p-2 focus:ring-2 focus:ring-brand-400">
+            </div>
+          </div>
+
+          <!-- Works & Experiences -->
+          <div class="space-y-2 pt-2 border-t border-slate-100">
+            <div class="flex items-center justify-between">
+              <h3 class="text-xs font-bold text-brand-500 uppercase tracking-wider flex items-center gap-1.5">
+                <i class="fa-solid fa-briefcase"></i> Works & Experiences
+              </h3>
+              <button type="button" onclick="addExperienceField()" class="text-[11px] text-brand-600 hover:text-brand-700 font-bold flex items-center gap-1">
+                <i class="fa-solid fa-plus-circle"></i> Add Experience
+              </button>
+            </div>
+
+            <div id="experience-fields-list" class="space-y-3">
+              <!-- Dynamically rendered experience items -->
+            </div>
+          </div>
+
+          <!-- Skills & Hobbies -->
+          <div class="space-y-2 pt-2 border-t border-slate-100">
+            <h3 class="text-xs font-bold text-brand-500 uppercase tracking-wider flex items-center gap-1.5">
+              <i class="fa-solid fa-wand-magic-sparkles"></i> Skills & Interests
+            </h3>
+            <div class="grid grid-cols-1 gap-2">
+              <div>
+                <label class="block text-[11px] font-semibold text-slate-600 mb-0.5">Language Skills</label>
+                <input type="text" id="input-languages" oninput="saveCurrentFormValues()" class="w-full text-xs border border-slate-200 rounded-lg p-2">
+              </div>
+              <div>
+                <label class="block text-[11px] font-semibold text-slate-600 mb-0.5">Digital & Technical Tools (Hard Skills)</label>
+                <input type="text" id="input-hardSkills" oninput="saveCurrentFormValues()" class="w-full text-xs border border-slate-200 rounded-lg p-2">
+              </div>
+              <div>
+                <label class="block text-[11px] font-semibold text-slate-600 mb-0.5">Soft Skills</label>
+                <input type="text" id="input-softSkills" oninput="saveCurrentFormValues()" class="w-full text-xs border border-slate-200 rounded-lg p-2">
+              </div>
+              <div>
+                <label class="block text-[11px] font-semibold text-slate-600 mb-0.5">Hobbies & Interests</label>
+                <input type="text" id="input-hobbies" oninput="saveCurrentFormValues()" class="w-full text-xs border border-slate-200 rounded-lg p-2">
+              </div>
+            </div>
+          </div>
+
+        </form>
+      </div>
+    </section>
+
+    <!-- RIGHT PANE: REAL-TIME EDITABLE A4 CV PREVIEW (Col 7) -->
+    <section class="lg:col-span-7 flex flex-col items-center">
+      
+      <div class="w-full bg-slate-200/80 p-2 sm:p-6 rounded-2xl border border-slate-300 shadow-inner flex justify-center overflow-x-auto min-h-[85vh]">
+        
+        <!-- Standard A4 Page -->
+        <div id="printable-cv-wrapper" class="w-full max-w-[21cm] min-h-[29.7cm] bg-white p-[1.5cm] shadow-2xl rounded-sm cv-document text-[10pt] leading-[1.35] relative">
+          
+          <!-- Live Rendered CV Document (Editable in real-time) -->
+          <div id="cv-rendered-content">
+            <!-- Dynamic CV generated via JS -->
+          </div>
+
+        </div>
+
+      </div>
+
+    </section>
+
+  </main>
+
+  <!-- Google Form Response Import Modal -->
+  <div id="import-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden no-print">
+    <div class="bg-white rounded-2xl max-w-2xl w-full p-6 shadow-2xl border border-slate-100 space-y-4">
+      <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+        <div class="flex items-center space-x-2">
+          <div class="w-8 h-8 rounded-lg bg-matcha-100 text-matcha-700 flex items-center justify-center font-bold">
+            <i class="fa-solid fa-file-import"></i>
+          </div>
+          <div>
+            <h3 class="font-bold text-slate-800 text-sm">Import Google Form Responses</h3>
+            <p class="text-xs text-slate-500">Paste raw Form row, published Google Sheet CSV link, or upload file</p>
+          </div>
+        </div>
+        <button onclick="toggleImportModal()" class="text-slate-400 hover:text-slate-600 text-sm">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <div class="space-y-4">
+        <!-- CSV Link -->
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1">Method 1: Published Google Sheet CSV Link</label>
+          <div class="flex gap-2">
+            <input type="text" id="modal-sheets-url" placeholder="https://docs.google.com/spreadsheets/d/.../export?format=csv" class="flex-1 text-xs border border-slate-300 rounded-lg p-2">
+            <button onclick="fetchSheetCSVFromModal()" class="bg-brand-500 hover:bg-brand-600 text-white text-xs font-semibold px-4 py-2 rounded-lg transition-all">
+              Fetch CSV
+            </button>
+          </div>
+        </div>
+
+        <!-- Raw Text Paste -->
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1">Method 2: Paste Raw Google Sheet / Form Response Row(s)</label>
+          <textarea id="modal-raw-text" rows="5" placeholder="Paste single or multiple response rows directly from Google Sheet here..." class="w-full text-xs font-mono border border-slate-300 rounded-lg p-2.5 resize-none focus:ring-2 focus:ring-brand-400"></textarea>
+        </div>
+
+        <!-- File Upload -->
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1">Method 3: Upload Exported CSV File</label>
+          <input type="file" id="modal-file-input" accept=".csv" onchange="handleModalFileSelect(event)" class="text-xs text-slate-500 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-brand-50 file:text-brand-600 hover:file:bg-brand-100">
+        </div>
+      </div>
+
+      <div class="pt-3 border-t border-slate-100 flex justify-end space-x-2">
+        <button onclick="toggleImportModal()" class="bg-slate-100 text-slate-700 text-xs font-semibold px-4 py-2 rounded-lg">Cancel</button>
+        <button onclick="parseModalRawText()" class="bg-matcha-500 hover:bg-matcha-700 text-white text-xs font-bold px-5 py-2 rounded-lg shadow-sm">
+          Parse & Import Responses
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Application State Storage
+    let responsesList = [];
+    let activeResponseIndex = 0;
+
+    // Exact Google Form Sample Response provided in prompt (TAN Wei Ming, John)
+    const johnSampleResponse = {
+      timestamp: "11/4/2026 15:15:41",
+      fullName: "TAN Wei Ming, John",
+      district: "Wan Chai District, Hong Kong",
+      phone: "+852 9876 5432",
+      email: "john.tan@gmail.com",
+      linkedin: "www.linkedin.com/nicolejanohan",
+      uniName: "The Hong Kong Polytechnic University, Hong Kong",
+      uniDuration: "September 2023 – Present (Expected Graduation: June 2027)",
+      uniMajor: "Bachelor of Science (Honours) in Hotel and Tourism Management, School of Hotel and Tourism Management",
+      uniCoursework: "Focuses on business operations, consumer behavior, and strategic management in the hospitality sector.",
+      uniAchievements: "Scholarship for Non-JUPAS Year 1 Recipient (2026), Dean's List (2024)",
+      uniActivities: "AIESEC in PolyU Outgoing Global Talent Member (2026-2027)",
+      hsName: "Queen's College, Hong Kong",
+      hsQualification: "Hong Kong Diploma of Secondary Education (HKDSE)",
+      hsAchievements: "Head Prefect (2022), 1st Place in Inter-school Debate",
+      otherEducation: "Exchange Semester at University of Toronto (Fall 2025)",
+      experiences: [
+        {
+          roleCompanyDates: "X Educational Center, Hong Kong (Phonics Tutor) - September 2025 to October 2026",
+          responsibilities: ["Designed interactive lesson plans for 20+ students aged 5-7."]
+        }
+      ],
+      otherExperiences: "",
+      languages: "English (Native), Cantonese (Fluent), Mandarin (Basic)",
+      hardSkills: "Canva, Microsoft Office, Python, MATLAB, Jupyter Notebook",
+      softSkills: "Patient, Creative, Flexible, Cross-cultural communication",
+      hobbies: "Photography, Volunteering, Graphic Designing"
+    };
+
+    // Initialize Page
+    window.onload = function() {
+      loadDefaultJohnResponse();
+    };
+
+    // Reset / Load John Sample Response
+    function loadDefaultJohnResponse() {
+      responsesList = [JSON.parse(JSON.stringify(johnSampleResponse))];
+      activeResponseIndex = 0;
+      updateApplicantDropdown();
+      loadActiveToForm();
+      renderCV();
+    }
+
+    // Toggle Import Modal
+    function toggleImportModal() {
+      const modal = document.getElementById('import-modal');
+      modal.classList.toggle('hidden');
+    }
+
+    // Update Applicant Switcher Dropdown
+    function updateApplicantDropdown() {
+      const selector = document.getElementById('applicant-selector');
+      selector.innerHTML = '';
+
+      responsesList.forEach((resp, idx) => {
+        const opt = document.createElement('option');
+        opt.value = idx;
+        opt.textContent = `${idx + 1}. ${resp.fullName || 'Unnamed Applicant'}`;
+        selector.appendChild(opt);
+      });
+
+      selector.value = activeResponseIndex;
+      document.getElementById('response-count-badge').textContent = `${responsesList.length} Loaded`;
+    }
+
+    // Switch Selected Applicant
+    function switchApplicant(idx) {
+      activeResponseIndex = parseInt(idx);
+      loadActiveToForm();
+      renderCV();
+    }
+
+    // Load active record into left side form
+    function loadActiveToForm() {
+      const resp = responsesList[activeResponseIndex];
+      if (!resp) return;
+
+      document.getElementById('input-fullName').value = resp.fullName || '';
+      document.getElementById('input-district').value = resp.district || '';
+      document.getElementById('input-phone').value = resp.phone || '';
+      document.getElementById('input-email').value = resp.email || '';
+      document.getElementById('input-linkedin').value = resp.linkedin || '';
+
+      document.getElementById('input-uniName').value = resp.uniName || '';
+      document.getElementById('input-uniDuration').value = resp.uniDuration || '';
+      document.getElementById('input-uniMajor').value = resp.uniMajor || '';
+      document.getElementById('input-uniCoursework').value = resp.uniCoursework || '';
+      document.getElementById('input-uniAchievements').value = resp.uniAchievements || '';
+      document.getElementById('input-uniActivities').value = resp.uniActivities || '';
+
+      document.getElementById('input-hsName').value = resp.hsName || '';
+      document.getElementById('input-hsQualification').value = resp.hsQualification || '';
+      document.getElementById('input-hsAchievements').value = resp.hsAchievements || '';
+      document.getElementById('input-otherEducation').value = resp.otherEducation || '';
+
+      document.getElementById('input-languages').value = resp.languages || '';
+      document.getElementById('input-hardSkills').value = resp.hardSkills || '';
+      document.getElementById('input-softSkills').value = resp.softSkills || '';
+      document.getElementById('input-hobbies').value = resp.hobbies || '';
+
+      // Populate experiences list in form
+      const expContainer = document.getElementById('experience-fields-list');
+      expContainer.innerHTML = '';
+
+      const exps = (resp.experiences && resp.experiences.length > 0) ? resp.experiences : [
+        { roleCompanyDates: '', responsibilities: [''] }
+      ];
+
+      exps.forEach((exp, idx) => {
+        renderExperienceFormField(exp, idx);
+      });
+    }
+
+    // Render single experience input field block
+    function renderExperienceFormField(exp, idx) {
+      const container = document.getElementById('experience-fields-list');
+      const div = document.createElement('div');
+      div.className = "bg-slate-50 p-3 rounded-xl border border-slate-200 space-y-2 relative exp-input-block";
+      
+      const bulletsText = (exp.responsibilities || []).join('\n');
+
+      div.innerHTML = `
+        <button type="button" onclick="removeExperienceField(this)" class="absolute top-2 right-2 text-red-400 hover:text-red-600 text-[10px] font-bold">
+          <i class="fa-solid fa-trash"></i>
+        </button>
+        <div>
+          <label class="block text-[10px] text-slate-500 font-medium">Company, Location, Role & Dates</label>
+          <input type="text" value="${escapeHtml(exp.roleCompanyDates || '')}" oninput="saveCurrentFormValues()" class="exp-header w-full text-xs border border-slate-200 rounded-lg p-1.5 bg-white" placeholder="Company (Role) - Dates">
+        </div>
+        <div>
+          <label class="block text-[10px] text-slate-500 font-medium">Key Responsibilities (1 per line)</label>
+          <textarea oninput="saveCurrentFormValues()" rows="2" class="exp-bullets w-full text-xs border border-slate-200 rounded-lg p-1.5 bg-white resize-none" placeholder="Bullet responsibilities...">${escapeHtml(bulletsText)}</textarea>
+        </div>
+      `;
+      container.appendChild(div);
+    }
+
+    // Add new experience block
+    function addExperienceField() {
+      renderExperienceFormField({ roleCompanyDates: '', responsibilities: [''] }, document.querySelectorAll('.exp-input-block').length);
+      saveCurrentFormValues();
+    }
+
+    // Remove experience block
+    function removeExperienceField(btn) {
+      btn.closest('.exp-input-block').remove();
+      saveCurrentFormValues();
+    }
+
+    // Save current form values to active response object and re-render
+    function saveCurrentFormValues() {
+      if (!responsesList[activeResponseIndex]) return;
+
+      const expBlocks = document.querySelectorAll('.exp-input-block');
+      const exps = [];
+      expBlocks.forEach(block => {
+        const header = block.querySelector('.exp-header').value;
+        const bulletsRaw = block.querySelector('.exp-bullets').value;
+        const bullets = bulletsRaw.split('\n').filter(b => b.trim().length > 0);
+
+        if (header || bullets.length > 0) {
+          exps.push({
+            roleCompanyDates: header,
+            responsibilities: bullets
+          });
+        }
+      });
+
+      responsesList[activeResponseIndex] = {
+        fullName: document.getElementById('input-fullName').value,
+        district: document.getElementById('input-district').value,
+        phone: document.getElementById('input-phone').value,
+        email: document.getElementById('input-email').value,
+        linkedin: document.getElementById('input-linkedin').value,
+
+        uniName: document.getElementById('input-uniName').value,
+        uniDuration: document.getElementById('input-uniDuration').value,
+        uniMajor: document.getElementById('input-uniMajor').value,
+        uniCoursework: document.getElementById('input-uniCoursework').value,
+        uniAchievements: document.getElementById('input-uniAchievements').value,
+        uniActivities: document.getElementById('input-uniActivities').value,
+
+        hsName: document.getElementById('input-hsName').value,
+        hsQualification: document.getElementById('input-hsQualification').value,
+        hsAchievements: document.getElementById('input-hsAchievements').value,
+        otherEducation: document.getElementById('input-otherEducation').value,
+
+        experiences: exps,
+
+        languages: document.getElementById('input-languages').value,
+        hardSkills: document.getElementById('input-hardSkills').value,
+        softSkills: document.getElementById('input-softSkills').value,
+        hobbies: document.getElementById('input-hobbies').value,
+      };
+
+      updateApplicantDropdown();
+      renderCV();
+    }
+
+    // Helper: Parse Experience Role, Company & Dates
+    function parseExperienceString(headerStr) {
+      if (!headerStr) return { title: 'Job Position', company: 'Company/Organization, Country', dates: 'Month 20XX – Month 20XX' };
+
+      // Format e.g., "X Educational Center, Hong Kong (Phonics Tutor) - September 2025 to October 2026"
+      let dates = '';
+      let mainPart = headerStr;
+
+      if (headerStr.includes(' - ')) {
+        const parts = headerStr.split(' - ');
+        mainPart = parts[0];
+        dates = parts.slice(1).join(' - ');
+      }
+
+      let role = '';
+      let company = mainPart;
+
+      if (mainPart.includes('(') && mainPart.includes(')')) {
+        const match = mainPart.match(/(.*?)\((.*?)\)/);
+        if (match) {
+          company = match[1].trim();
+          role = match[2].trim();
+        }
+      }
+
+      return {
+        company: company || mainPart,
+        title: role || 'Job Position',
+        dates: dates || ''
+      };
+    }
+
+    // RENDER EXACT AIESEC POLYU CV TEMPLATE
+    function renderCV() {
+      const resp = responsesList[activeResponseIndex] || johnSampleResponse;
+      const cvContainer = document.getElementById('cv-rendered-content');
+
+      // Experiences HTML
+      let expsHTML = '';
+      if (resp.experiences && resp.experiences.length > 0) {
+        expsHTML = resp.experiences.map(exp => {
+          const parsed = parseExperienceString(exp.roleCompanyDates);
+          const bulletsList = (exp.responsibilities || []).map(b => `<li contenteditable="true">${escapeHtml(b)}</li>`).join('');
+
+          return `
+            <div style="margin-bottom: 10px;">
+              <div style="display: flex; justify-content: space-between; align-items: baseline; font-weight: bold; font-size: 10.5pt;">
+                <span contenteditable="true">${escapeHtml(parsed.company)}</span>
+                <span contenteditable="true">${escapeHtml(parsed.dates)}</span>
+              </div>
+              <div style="font-style: italic; font-size: 10pt; margin-bottom: 2px;" contenteditable="true">
+                ${escapeHtml(parsed.title)}
+              </div>
+              <ul class="cv-bullet-list">
+                ${bulletsList.length > 0 ? bulletsList : '<li contenteditable="true">Describe your work and experience</li>'}
+              </ul>
+            </div>
+          `;
+        }).join('');
+      } else {
+        expsHTML = `
+          <div style="margin-bottom: 10px;">
+            <div style="display: flex; justify-content: space-between; font-weight: bold;">
+              <span contenteditable="true">Company/Organization, Country</span>
+              <span contenteditable="true">Month 20XX – Month 20XX</span>
+            </div>
+            <div style="font-style: italic;" contenteditable="true">Job Position</div>
+            <ul class="cv-bullet-list">
+              <li contenteditable="true">Describe your work and experience</li>
+            </ul>
+          </div>
+        `;
+      }
+
+      // Exact PDF Structure
+      cvContainer.innerHTML = `
+        <!-- HEADER -->
+        <div style="text-align: center; margin-bottom: 14px;">
+          <h1 contenteditable="true" style="font-size: 18pt; font-weight: bold; letter-spacing: 0.5px; margin: 0; padding: 0; text-transform: uppercase;">
+            ${escapeHtml(resp.fullName || 'FULL NAME')}
+          </h1>
+          <div style="font-size: 10pt; margin-top: 4px;">
+            <span contenteditable="true">${escapeHtml(resp.district || 'Your District')}</span> &nbsp;|&nbsp; 
+            <span contenteditable="true">${escapeHtml(resp.phone || '+852 XXXX XXXX')}</span> &nbsp;|&nbsp; 
+            <span contenteditable="true">${escapeHtml(resp.email || 'Personal Email')}</span> &nbsp;|&nbsp; 
+            <span contenteditable="true">${escapeHtml(resp.linkedin || 'www.linkedin.com/username')}</span>
+          </div>
+        </div>
+
+        <!-- ACADEMIC BACKGROUND -->
+        <div class="cv-section-title">ACADEMIC BACKGROUND</div>
+        
+        <!-- University -->
+        <div style="margin-bottom: 10px;">
+          <div style="display: flex; justify-content: space-between; align-items: baseline; font-weight: bold; font-size: 10.5pt;">
+            <span contenteditable="true">${escapeHtml(resp.uniName || 'Hong Kong Polytechnic University, Hong Kong')}</span>
+            <span contenteditable="true">${escapeHtml(resp.uniDuration || 'Month 20XX - Present')}</span>
+          </div>
+          <div style="font-size: 10pt; margin-bottom: 2px;" contenteditable="true">
+            ${escapeHtml(resp.uniMajor || 'Bachelor of Science (Honours) in Major')}
+          </div>
+          <ul class="cv-bullet-list">
+            ${resp.uniCoursework ? `<li><strong>Relevant Coursework:</strong> <span contenteditable="true">${escapeHtml(resp.uniCoursework)}</span></li>` : ''}
+            ${resp.uniAchievements && resp.uniAchievements !== 'N/A' ? `<li><strong>Achievements:</strong> <span contenteditable="true">${escapeHtml(resp.uniAchievements)}</span></li>` : ''}
+            ${resp.uniActivities && resp.uniActivities !== 'N/A' ? `<li><strong>Activities:</strong> <span contenteditable="true">${escapeHtml(resp.uniActivities)}</span></li>` : ''}
+          </ul>
+        </div>
+
+        <!-- High School -->
+        <div style="margin-bottom: 10px;">
+          <div style="display: flex; justify-content: space-between; align-items: baseline; font-weight: bold; font-size: 10.5pt;">
+            <span contenteditable="true">${escapeHtml(resp.hsName || 'High School Name, Hong Kong')}</span>
+          </div>
+          <div style="font-size: 10pt; margin-bottom: 2px;" contenteditable="true">
+            ${escapeHtml(resp.hsQualification || 'Hong Kong Diploma of Secondary Education (HKDSE)')}
+          </div>
+          <ul class="cv-bullet-list">
+            ${resp.hsAchievements ? `<li><strong>Achievements & Activities:</strong> <span contenteditable="true">${escapeHtml(resp.hsAchievements)}</span></li>` : ''}
+          </ul>
+        </div>
+
+        <!-- Other Education (if present) -->
+        ${resp.otherEducation ? `
+        <div style="margin-bottom: 10px;">
+          <div style="font-weight: bold; font-size: 10.5pt;">Other Education</div>
+          <ul class="cv-bullet-list">
+            <li contenteditable="true">${escapeHtml(resp.otherEducation)}</li>
+          </ul>
+        </div>
+        ` : ''}
+
+        <!-- WORKS AND EXPERIENCES -->
+        <div class="cv-section-title">WORKS AND EXPERIENCES</div>
+        ${expsHTML}
+
+        <!-- SKILLS -->
+        <div class="cv-section-title">SKILLS</div>
+        <div style="font-size: 10pt; line-height: 1.5; margin-top: 4px;">
+          <div><strong>Language:</strong> <span contenteditable="true">${escapeHtml(resp.languages || 'English, Cantonese, Mandarin')}</span></div>
+          ${resp.hardSkills ? `<div><strong>Hard Skills / Technical Tools:</strong> <span contenteditable="true">${escapeHtml(resp.hardSkills)}</span></div>` : ''}
+          ${resp.softSkills ? `<div><strong>Soft Skills:</strong> <span contenteditable="true">${escapeHtml(resp.softSkills)}</span></div>` : ''}
+          ${resp.hobbies ? `<div><strong>Hobbies:</strong> <span contenteditable="true">${escapeHtml(resp.hobbies)}</span></div>` : ''}
+        </div>
+      `;
+    }
+
+    // Add New Blank Applicant
+    function addNewBlankApplicant() {
+      const blank = {
+        fullName: "New Applicant Name",
+        district: "Hong Kong",
+        phone: "+852 9000 0000",
+        email: "applicant@gmail.com",
+        linkedin: "www.linkedin.com/in/applicant",
+        uniName: "The Hong Kong Polytechnic University, Hong Kong",
+        uniDuration: "September 2024 – Present",
+        uniMajor: "Bachelor of Business Administration (Honours)",
+        uniCoursework: "Focuses on corporate management and international trade.",
+        uniAchievements: "Dean's List (2025)",
+        uniActivities: "PolyU Society Member",
+        hsName: "Secondary School, Hong Kong",
+        hsQualification: "HKDSE",
+        hsAchievements: "School Prefect",
+        experiences: [
+          { roleCompanyDates: "Company Name (Intern) - June 2025 to August 2025", responsibilities: ["Assisted in daily administrative duties and project coordination."] }
+        ],
+        languages: "English (Fluent), Cantonese (Native)",
+        hardSkills: "Microsoft Office, Canva",
+        softSkills: "Communication, Teamwork",
+        hobbies: "Reading, Swimming"
+      };
+
+      responsesList.push(blank);
+      activeResponseIndex = responsesList.length - 1;
+      updateApplicantDropdown();
+      loadActiveToForm();
+      renderCV();
+    }
+
+    // Parse Google Form CSV or Tab-Separated Responses
+    function parseModalRawText() {
+      const rawText = document.getElementById('modal-raw-text').value.trim();
+      if (!rawText) {
+        alert("Please paste response text or load a CSV first.");
+        return;
+      }
+
+      Papa.parse(rawText, {
+        header: false,
+        skipEmptyLines: true,
+        complete: function(results) {
+          if (results.data && results.data.length > 0) {
+            processParsedRows(results.data);
+            toggleImportModal();
+          } else {
+            alert("Could not parse data rows. Check formatting.");
+          }
+        }
+      });
+    }
+
+    // Fetch Google Sheet CSV
+    function fetchSheetCSVFromModal() {
+      const url = document.getElementById('modal-sheets-url').value.trim();
+      if (!url) {
+        alert("Please enter a valid Google Sheet CSV URL.");
+        return;
+      }
+
+      Papa.parse(url, {
+        download: true,
+        header: false,
+        skipEmptyLines: true,
+        complete: function(results) {
+          if (results.data && results.data.length > 0) {
+            processParsedRows(results.data);
+            toggleImportModal();
+          }
+        },
+        error: function(err) {
+          alert("Error fetching URL: " + err.message);
+        }
+      });
+    }
+
+    function handleModalFileSelect(evt) {
+      const file = evt.target.files[0];
+      if (!file) return;
+
+      Papa.parse(file, {
+        header: false,
+        skipEmptyLines: true,
+        complete: function(results) {
+          if (results.data && results.data.length > 0) {
+            processParsedRows(results.data);
+            toggleImportModal();
+          }
+        }
+      });
+    }
+
+    // Map Google Form response columns to internal object structure
+    function processParsedRows(rows) {
+      // If first row is headers, skip it
+      let dataRows = rows;
+      if (rows[0][1] && (rows[0][1].toLowerCase().includes('name') || rows[0][0].toLowerCase().includes('timestamp'))) {
+        dataRows = rows.slice(1);
+      }
+
+      const imported = dataRows.map(r => {
+        // Safe getter
+        const getVal = (idx) => (r[idx] ? String(r[idx]).trim() : '');
+
+        const exps = [];
+        if (getVal(16)) {
+          exps.push({ roleCompanyDates: getVal(16), responsibilities: [getVal(17)] });
+        }
+        if (getVal(18)) {
+          exps.push({ roleCompanyDates: getVal(18), responsibilities: [getVal(19)] });
+        }
+        if (getVal(20)) {
+          exps.push({ roleCompanyDates: getVal(20), responsibilities: [getVal(21)] });
+        }
+
+        return {
+          timestamp: getVal(0),
+          fullName: getVal(1) || 'Applicant Name',
+          district: getVal(2) || 'Hong Kong',
+          phone: getVal(3) || '+852 XXXX XXXX',
+          email: getVal(4) || 'email@example.com',
+          linkedin: getVal(5) || 'www.linkedin.com',
+          uniName: getVal(6) || 'The Hong Kong Polytechnic University',
+          uniDuration: getVal(7) || '2023 - Present',
+          uniMajor: getVal(8) || 'Degree Major',
+          uniCoursework: getVal(9),
+          uniAchievements: getVal(10),
+          uniActivities: getVal(11),
+          hsName: getVal(12) || 'High School Name',
+          hsQualification: getVal(13) || 'HKDSE',
+          hsAchievements: getVal(14),
+          otherEducation: getVal(15),
+          experiences: exps,
+          otherExperiences: getVal(22),
+          languages: getVal(23),
+          hardSkills: getVal(24),
+          softSkills: getVal(25),
+          hobbies: getVal(26)
+        };
+      });
+
+      responsesList = imported;
+      activeResponseIndex = 0;
+      updateApplicantDropdown();
+      loadActiveToForm();
+      renderCV();
+    }
+
+    function escapeHtml(text) {
+      if (!text) return '';
+      return String(text)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+  </script>
+</body>
+</html>
