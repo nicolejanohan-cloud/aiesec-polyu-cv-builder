@@ -39,4 +39,445 @@
             body * {
                 visibility: hidden;
             }
-            #cv-preview-container, #cv-preview-
+            #cv-preview-container, #cv-preview-container * {
+                visibility: visible;
+            }
+            #cv-preview-container {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+                margin: 0;
+                padding: 0;
+                box-shadow: none !important;
+                background: white !important;
+            }
+            .no-print {
+                display: none !important;
+            }
+        }
+        .cv-page {
+            width: 210mm;
+            min-height: 297mm;
+            padding: 15mm 20mm;
+            background: white;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            margin: 0 auto;
+            color: #000;
+            font-family: 'EB Garamond', serif;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 font-sans min-h-screen flex flex-col">
+
+    <!-- Top Navigation -->
+    <header class="bg-slate-900 text-white shadow-md no-print">
+        <div class="max-w-7xl mx-auto px-6 py-4 flex flex-col md:flex-row justify-between items-center gap-4">
+            <div class="flex items-center space-x-3">
+                <div class="bg-brand-aiesec text-white p-2.5 rounded-xl font-bold text-lg flex items-center justify-center shadow">
+                    <i class="fa-solid fa-earth-asia"></i>
+                </div>
+                <div>
+                    <h1 class="text-xl font-bold tracking-tight">[AIESEC in PolyU] Global Exchange CV Builder</h1>
+                    <p class="text-xs text-slate-400">Automated Google Form Response Processor & CV Formatter for oGT</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-3">
+                <button onclick="loadSampleData()" class="bg-slate-800 hover:bg-slate-700 text-slate-200 px-4 py-2 rounded-lg text-sm font-medium border border-slate-700 transition flex items-center gap-2">
+                    <i class="fa-solid fa-wand-magic-sparkles text-brand-500"></i> Sample Applicant
+                </button>
+                <button onclick="window.print()" class="bg-brand-aiesec hover:bg-blue-600 text-white px-5 py-2 rounded-lg text-sm font-semibold shadow transition flex items-center gap-2">
+                    <i class="fa-solid fa-print"></i> Print / Export PDF
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Sub-bar: Applicant Selector & Controls -->
+    <div class="bg-white border-b border-slate-200 shadow-sm no-print py-3 px-6">
+        <div class="max-w-7xl mx-auto flex flex-col lg:flex-row justify-between items-center gap-4">
+            
+            <!-- Applicant Selector & Management -->
+            <div class="flex items-center gap-3 w-full lg:w-auto flex-wrap">
+                <span class="text-xs font-bold text-slate-500 uppercase tracking-wider whitespace-nowrap">
+                    <i class="fa-solid fa-users text-brand-600 mr-1"></i> Applicant:
+                </span>
+                <select id="applicantSelect" onchange="selectApplicant(this.value)" class="bg-slate-50 border border-slate-300 rounded-lg py-2 px-3 text-sm font-medium text-slate-800 focus:ring-2 focus:ring-brand-aiesec focus:outline-none min-w-[240px]">
+                </select>
+                <span id="badgeCount" class="text-xs bg-brand-50 text-brand-700 font-semibold px-2.5 py-1 rounded-full whitespace-nowrap">1 Loaded</span>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="flex items-center gap-2 w-full lg:w-auto justify-end flex-wrap">
+                <label class="cursor-pointer bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-2 rounded-lg text-xs font-semibold border border-slate-300 transition flex items-center gap-1.5">
+                    <i class="fa-solid fa-file-csv text-brand-600"></i> Import Form CSV
+                    <input type="file" id="csvFileInput" accept=".csv" class="hidden" onchange="handleFileUpload(event)">
+                </label>
+
+                <button onclick="addNewApplicant()" class="bg-emerald-50 hover:bg-emerald-100 text-emerald-700 px-3 py-2 rounded-lg text-xs font-semibold border border-emerald-200 transition flex items-center gap-1.5">
+                    <i class="fa-solid fa-user-plus"></i> New Applicant
+                </button>
+
+                <button onclick="deleteCurrentApplicant()" class="bg-rose-50 hover:bg-rose-100 text-rose-700 px-3 py-2 rounded-lg text-xs font-semibold border border-rose-200 transition flex items-center gap-1.5 shadow-sm">
+                    <i class="fa-solid fa-trash-can text-rose-600"></i> Delete Applicant
+                </button>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Style Customizer Bar (Font Size & Spacing) -->
+    <div class="bg-slate-100 border-b border-slate-200 py-2 px-6 no-print">
+        <div class="max-w-7xl mx-auto flex items-center justify-end gap-6 text-xs text-slate-600">
+            <div class="flex items-center gap-2">
+                <span class="font-semibold"><i class="fa-solid fa-text-height mr-1"></i> Font Size:</span>
+                <select id="fontSizeSelect" onchange="updateStyleSettings()" class="bg-white border border-slate-300 rounded px-2 py-1 text-xs font-medium focus:outline-none">
+                    <option value="10pt">Compact (10 pt)</option>
+                    <option value="11pt" selected>Standard (11 pt)</option>
+                    <option value="12pt">Large (12 pt)</option>
+                </select>
+            </div>
+            <div class="flex items-center gap-2">
+                <span class="font-semibold"><i class="fa-solid fa-arrows-alt-v mr-1"></i> Line Spacing:</span>
+                <select id="lineSpacingSelect" onchange="updateStyleSettings()" class="bg-white border border-slate-300 rounded px-2 py-1 text-xs font-medium focus:outline-none">
+                    <option value="1.25">Tight (1.25)</option>
+                    <option value="1.35" selected>Standard (1.35)</option>
+                    <option value="1.5">Relaxed (1.5)</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Workspace -->
+    <main class="max-w-7xl mx-auto px-6 py-6 flex-grow w-full grid grid-cols-1 lg:grid-cols-12 gap-6">
+        
+        <!-- Left Column: Live Editor Form -->
+        <div class="lg:col-span-5 space-y-6 no-print">
+            <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-5">
+                <div class="flex justify-between items-center mb-4 pb-2 border-b border-slate-100">
+                    <h2 class="text-sm font-bold text-slate-800 flex items-center gap-2">
+                        <i class="fa-solid fa-pen-to-square text-brand-600"></i> Form Response Data Editor
+                    </h2>
+                    <button onclick="resetCurrentForm()" class="text-xs text-slate-400 hover:text-slate-600 underline">Reset Fields</button>
+                </div>
+                
+                <div class="space-y-3.5 max-h-[550px] overflow-y-auto pr-2" id="formFieldsContainer">
+                    <!-- Dynamically populated fields -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Column: Live A4 Preview -->
+        <div class="lg:col-span-7 flex flex-col items-center">
+            <div class="w-full flex justify-between items-center mb-3 no-print">
+                <span class="text-xs font-bold uppercase tracking-wider text-slate-500">AIESEC PolyU Standard CV Layout Preview</span>
+                <span class="text-xs text-slate-400"><i class="fa-solid fa-circle-info mr-1"></i> Updates live as you type</span>
+            </div>
+
+            <div id="cv-preview-container" class="w-full overflow-x-auto flex justify-center">
+                <div class="cv-page" id="cvPreview">
+                    <!-- CV Rendered Here -->
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <footer class="bg-slate-900 text-slate-400 py-4 text-center text-xs no-print mt-auto border-t border-slate-800">
+        [AIESEC in PolyU] Outgoing Global Talent (oGT) Operational Tool • 2026-2027 Term
+    </footer>
+
+    <script>
+        let applicantsData = [];
+        let currentApplicantIndex = 0;
+
+        const blankRecord = {
+            "Timestamp": "11/4/2026 16:00:00",
+            "Full Name": "New Applicant Name",
+            "District": "District, Hong Kong",
+            "Contact Number": "+852 0000 0000",
+            "Personal Email": "applicant@email.com",
+            "LinkedIn": "www.linkedin.com/username",
+            "University": "The Hong Kong Polytechnic University, Hong Kong",
+            "University Duration": "September 2023 – Present",
+            "University Major": "Bachelor of Business Administration, Department of Management",
+            "Coursework": "Focuses on business management, leadership, and global operations.",
+            "Uni Achievements": "N/A",
+            "Uni Activities": "AIESEC in PolyU Member (2026)",
+            "High School": "Secondary School Name, Hong Kong",
+            "HS Qualification": "Hong Kong Diploma of Secondary Education (HKDSE)",
+            "HS Achievements": "N/A",
+            "Other Education": "",
+            "Exp 1 Company": "Organization Name, Hong Kong (Role Title)",
+            "Exp 1 Date": "Month 20XX - Present",
+            "Exp 1 Tasks": "Describe key responsibilities and achievements.",
+            "Exp 2 Company": "",
+            "Exp 2 Date": "",
+            "Exp 2 Tasks": "",
+            "Exp 3 Company": "",
+            "Exp 3 Date": "",
+            "Exp 3 Tasks": "",
+            "Other Experiences": "",
+            "Languages": "English (Native), Cantonese (Fluent)",
+            "Tech Skills": "Canva, Microsoft Office",
+            "Soft Skills": "Communication, Teamwork",
+            "Hobbies": "Volunteering, Reading"
+        };
+
+        const sampleRecord = { ...blankRecord,
+            "Full Name": "TAN Wei Ming, John",
+            "District": "Wan Chai District, Hong Kong",
+            "Contact Number": "+852 9876 5432",
+            "Personal Email": "john.tan@gmail.com",
+            "LinkedIn": "www.linkedin.com/nicolejanohan",
+            "University": "The Hong Kong Polytechnic University, Hong Kong",
+            "University Duration": "September 2023 – Present (Expected Graduation: June 2027)",
+            "University Major": "Bachelor of Science (Honours) in Hotel and Tourism Management, School of Hotel and Tourism Management",
+            "Coursework": "Focuses on business operations, consumer behavior, and strategic management in the hospitality sector",
+            "Uni Achievements": "Scholarship for Non-JUPAS Year 1 Recipient (2026), Dean's List (2024)",
+            "Uni Activities": "AIESEC in PolyU Outgoing Global Talent Member (2026-2027)",
+            "High School": "Queen's College, Hong Kong",
+            "HS Qualification": "Hong Kong Diploma of Secondary Education (HKDSE)",
+            "HS Achievements": "Head Prefect (2022), 1st Place in Inter-school Debate",
+            "Other Education": "Exchange Semester at University of Toronto (Fall 2025)",
+            "Exp 1 Company": "X Educational Center, Hong Kong (Phonics Tutor)",
+            "Exp 1 Date": "September 2025 to October 2026",
+            "Exp 1 Tasks": "Designed interactive lesson plans for 20+ students aged 5-7.",
+            "Languages": "English (Native), Cantonese (Fluent), Mandarin (Basic)",
+            "Tech Skills": "Canva, Microsoft Office, Python, MATLAB, Jupyter Notebook",
+            "Soft Skills": "Patient, Creative, Flexible, Cross-cultural communication",
+            "Hobbies": "Photography, Volunteering, Graphic Designing"
+        };
+
+        function initApp() {
+            applicantsData = [sampleRecord];
+            currentApplicantIndex = 0;
+            updateUI();
+        }
+
+        function loadSampleData() {
+            applicantsData = [sampleRecord];
+            currentApplicantIndex = 0;
+            updateUI();
+        }
+
+        function addNewApplicant() {
+            const newEntry = JSON.parse(JSON.stringify(blankRecord));
+            newEntry["Full Name"] = "Applicant " + (applicantsData.length + 1);
+            applicantsData.push(newEntry);
+            currentApplicantIndex = applicantsData.length - 1;
+            updateUI();
+        }
+
+        function deleteCurrentApplicant() {
+            if (applicantsData.length <= 1) {
+                alert("You must keep at least one applicant record in the workspace.");
+                return;
+            }
+            if (confirm(`Are you sure you want to delete "${applicantsData[currentApplicantIndex]["Full Name"]}"?`)) {
+                applicantsData.splice(currentApplicantIndex, 1);
+                currentApplicantIndex = Math.max(0, currentApplicantIndex - 1);
+                updateUI();
+            }
+        }
+
+        function updateUI() {
+            renderSelector();
+            renderForm(applicantsData[currentApplicantIndex]);
+            renderCV(applicantsData[currentApplicantIndex]);
+            document.getElementById('badgeCount').innerText = `${applicantsData.length} Loaded`;
+        }
+
+        function updateStyleSettings() {
+            renderCV(applicantsData[currentApplicantIndex]);
+        }
+
+        function handleFileUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            Papa.parse(file, {
+                header: true,
+                skipEmptyLines: true,
+                complete: function(results) {
+                    if (results.data && results.data.length > 0) {
+                        applicantsData = results.data.map(row => {
+                            const keys = Object.keys(row);
+                            return {
+                                "Timestamp": row[keys[0]] || "",
+                                "Full Name": row[keys[1]] || "Unnamed Applicant",
+                                "District": row[keys[2]] || "",
+                                "Contact Number": row[keys[3]] || "",
+                                "Personal Email": row[keys[4]] || "",
+                                "LinkedIn": row[keys[5]] || "",
+                                "University": row[keys[6]] || "",
+                                "University Duration": row[keys[7]] || "",
+                                "University Major": row[keys[8]] || "",
+                                "Coursework": row[keys[9]] || "",
+                                "Uni Achievements": row[keys[10]] || "",
+                                "Uni Activities": row[keys[11]] || "",
+                                "High School": row[keys[12]] || "",
+                                "HS Qualification": row[keys[13]] || "",
+                                "HS Achievements": row[keys[14]] || "",
+                                "Other Education": row[keys[15]] || "",
+                                "Exp 1 Company": row[keys[16]] || "",
+                                "Exp 1 Tasks": row[keys[17]] || "",
+                                "Exp 2 Company": row[keys[18]] || "",
+                                "Exp 2 Tasks": row[keys[19]] || "",
+                                "Exp 3 Company": row[keys[20]] || "",
+                                "Exp 3 Tasks": row[keys[21]] || "",
+                                "Other Experiences": row[keys[22]] || "",
+                                "Languages": row[keys[23]] || "",
+                                "Tech Skills": row[keys[24]] || "",
+                                "Soft Skills": row[keys[25]] || "",
+                                "Hobbies": row[keys[26]] || ""
+                            };
+                        });
+                        currentApplicantIndex = 0;
+                        updateUI();
+                    }
+                }
+            });
+        }
+
+        function renderSelector() {
+            const select = document.getElementById('applicantSelect');
+            select.innerHTML = applicantsData.map((app, idx) => 
+                `<option value="${idx}" ${idx === currentApplicantIndex ? 'selected' : ''}>${idx + 1}. ${app["Full Name"] || "Unnamed Applicant"}</option>`
+            ).join('');
+        }
+
+        function selectApplicant(index) {
+            currentApplicantIndex = parseInt(index);
+            renderForm(applicantsData[currentApplicantIndex]);
+            renderCV(applicantsData[currentApplicantIndex]);
+        }
+
+        function renderForm(data) {
+            const container = document.getElementById('formFieldsContainer');
+            container.innerHTML = Object.keys(data).map(key => `
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">${key}</label>
+                    <input type="text" value="${escapeHtml(data[key])}" oninput="updateField('${key}', this.value)" 
+                        class="w-full bg-slate-50 border border-slate-300 rounded-lg p-2 text-xs text-slate-800 focus:ring-1 focus:ring-brand-aiesec focus:outline-none">
+                </div>
+            `).join('');
+        }
+
+        function updateField(key, value) {
+            applicantsData[currentApplicantIndex][key] = value;
+            renderCV(applicantsData[currentApplicantIndex]);
+            if (key === "Full Name") {
+                renderSelector();
+            }
+        }
+
+        function resetCurrentForm() {
+            applicantsData[currentApplicantIndex] = JSON.parse(JSON.stringify(sampleRecord));
+            updateUI();
+        }
+
+        function escapeHtml(str) {
+            if (!str) return '';
+            return str.replace(/"/g, '"').replace(/'/g, ''');
+        }
+
+        function renderCV(d) {
+            const preview = document.getElementById('cvPreview');
+            const fontSize = document.getElementById('fontSizeSelect').value;
+            const lineSpacing = document.getElementById('lineSpacingSelect').value;
+            
+            preview.style.fontSize = fontSize;
+            preview.style.lineHeight = lineSpacing;
+
+            preview.innerHTML = `
+                <!-- Header -->
+                <div class="text-center mb-4">
+                    <h2 class="text-xl font-bold uppercase tracking-wide text-black">${d["Full Name"] || "YOUR FULL NAME"}</h2>
+                    <p class="text-xs text-slate-800 mt-1">
+                        ${d["District"] || "Your District"}  |  ${d["Contact Number"] || "+852 XXXX XXXX"}  |  ${d["Personal Email"] || "email@domain.com"}  |  ${d["LinkedIn"] || "www.linkedin.com/username"}
+                    </p>
+                </div>
+
+                <!-- ACADEMIC BACKGROUND -->
+                <div class="mb-4">
+                    <h3 class="text-xs font-bold uppercase tracking-wider border-b border-black pb-0.5 mb-2 text-black">Academic Background</h3>
+                    
+                    <!-- University -->
+                    <div class="mb-2.5">
+                        <div class="flex justify-between items-baseline font-bold text-black">
+                            <span>${d["University"] || "University Name, Location"}</span>
+                            <span>${d["University Duration"] || "Month 20XX - Present"}</span>
+                        </div>
+                        <div class="italic text-black">${d["University Major"] || "Bachelor of Degree in Major, Department"}</div>
+                        <div class="text-black mt-0.5"><strong>Relevant Coursework:</strong> ${d["Coursework"] || ""}</div>
+                        ${d["Uni Achievements"] ? `<div class="text-black"><strong>Achievements:</strong> ${d["Uni Achievements"]}</div>` : ''}
+                        ${d["Uni Activities"] ? `<div class="text-black"><strong>Activities:</strong> ${d["Uni Activities"]}</div>` : ''}
+                    </div>
+
+                    <!-- High School -->
+                    <div class="mb-2">
+                        <div class="flex justify-between items-baseline font-bold text-black">
+                            <span>${d["High School"] || "High School Name, Location"}</span>
+                            <span>High School Duration</span>
+                        </div>
+                        <div class="text-black">${d["HS Qualification"] || "High School Qualification"}</div>
+                        ${d["HS Achievements"] ? `<div class="text-black"><strong>Achievements & Activities:</strong> ${d["HS Achievements"]}</div>` : ''}
+                    </div>
+
+                    ${d["Other Education"] ? `<div class="text-black"><strong>Other Education:</strong> ${d["Other Education"]}</div>` : ''}
+                </div>
+
+                <!-- WORKS AND EXPERIENCES -->
+                <div class="mb-4">
+                    <h3 class="text-xs font-bold uppercase tracking-wider border-b border-black pb-0.5 mb-2 text-black">Works and Experiences</h3>
+                    
+                    <div class="space-y-2.5">
+                        <div>
+                            <div class="flex justify-between items-baseline font-bold text-black">
+                                <span>${d["Exp 1 Company"] || "Company/Organization, Country"}</span>
+                                <span>${d["Exp 1 Date"] || "Month 20XX - Month 20XX"}</span>
+                            </div>
+                            <div class="text-black mt-0.5">• ${d["Exp 1 Tasks"] || "Describe your work and experience"}</div>
+                        </div>
+
+                        ${d["Exp 2 Company"] ? `
+                        <div>
+                            <div class="flex justify-between items-baseline font-bold text-black">
+                                <span>${d["Exp 2 Company"]}</span>
+                            </div>
+                            <div class="text-black mt-0.5">• ${d["Exp 2 Tasks"] || ""}</div>
+                        </div>` : ''}
+
+                        ${d["Exp 3 Company"] ? `
+                        <div>
+                            <div class="flex justify-between items-baseline font-bold text-black">
+                                <span>${d["Exp 3 Company"]}</span>
+                            </div>
+                            <div class="text-black mt-0.5">• ${d["Exp 3 Tasks"] || ""}</div>
+                        </div>` : ''}
+
+                        ${d["Other Experiences"] ? `
+                        <div class="text-black">
+                            <strong>Additional Experience:</strong> ${d["Other Experiences"]}
+                        </div>` : ''}
+                    </div>
+                </div>
+
+                <!-- SKILLS -->
+                <div>
+                    <h3 class="text-xs font-bold uppercase tracking-wider border-b border-black pb-0.5 mb-2 text-black">Skills</h3>
+                    <div class="space-y-1 text-black">
+                        <div><strong>Language:</strong> ${d["Languages"] || "English (Native)"}</div>
+                        <div><strong>Hard Skills:</strong> ${d["Tech Skills"] || ""}</div>
+                        <div><strong>Soft Skills:</strong> ${d["Soft Skills"] || ""}</div>
+                        <div><strong>Hobbies:</strong> ${d["Hobbies"] || ""}</div>
+                    </div>
+                </div>
+            `;
+        }
+
+        window.onload = initApp;
+    </script>
+</body>
+</html>
