@@ -191,6 +191,39 @@
         let applicantsData = [];
         let currentApplicantIndex = 0;
 
+        const sampleRecord = {
+            "Timestamp": "11/4/2026 15:15:41",
+            "Full Name": "TAN Wei Ming, John",
+            "District": "Wan Chai District, Hong Kong",
+            "Contact Number": "+852 9876 5432",
+            "Personal Email": "john.tan@gmail.com",
+            "LinkedIn": "www.linkedin.com/nicolejanohan",
+            "University": "The Hong Kong Polytechnic University, Hong Kong",
+            "University Duration": "September 2023 – Present (Expected Graduation: June 2027)",
+            "University Major": "Bachelor of Science (Honours) in Hotel and Tourism Management, School of Hotel and Tourism Management",
+            "Coursework": "Focuses on business operations, consumer behavior, and strategic management in the hospitality sector",
+            "Uni Achievements": "Scholarship for Non-JUPAS Year 1 Recipient (2026), Dean's List (2024)",
+            "Uni Activities": "AIESEC in PolyU Outgoing Global Talent Member (2026-2027)",
+            "High School": "Queen's College, Hong Kong",
+            "HS Qualification": "Hong Kong Diploma of Secondary Education (HKDSE)",
+            "HS Achievements": "Head Prefect (2022), 1st Place in Inter-school Debate",
+            "Other Education": "Exchange Semester at University of Toronto (Fall 2025)",
+            "Exp 1 Company": "X Educational Center, Hong Kong (Phonics Tutor)",
+            "Exp 1 Date": "September 2025 to October 2026",
+            "Exp 1 Tasks": "Designed interactive lesson plans for 20+ students aged 5-7.",
+            "Exp 2 Company": "",
+            "Exp 2 Date": "",
+            "Exp 2 Tasks": "",
+            "Exp 3 Company": "",
+            "Exp 3 Date": "",
+            "Exp 3 Tasks": "",
+            "Other Experiences": "",
+            "Languages": "English (Native), Cantonese (Fluent), Mandarin (Basic)",
+            "Tech Skills": "Canva, Microsoft Office, Python, MATLAB, Jupyter Notebook",
+            "Soft Skills": "Patient, Creative, Flexible, Cross-cultural communication",
+            "Hobbies": "Photography, Volunteering, Graphic Designing"
+        };
+
         const blankRecord = {
             "Timestamp": "11/4/2026 16:00:00",
             "Full Name": "New Applicant Name",
@@ -222,31 +255,6 @@
             "Tech Skills": "Canva, Microsoft Office",
             "Soft Skills": "Communication, Teamwork",
             "Hobbies": "Volunteering, Reading"
-        };
-
-        const sampleRecord = { ...blankRecord,
-            "Full Name": "TAN Wei Ming, John",
-            "District": "Wan Chai District, Hong Kong",
-            "Contact Number": "+852 9876 5432",
-            "Personal Email": "john.tan@gmail.com",
-            "LinkedIn": "www.linkedin.com/nicolejanohan",
-            "University": "The Hong Kong Polytechnic University, Hong Kong",
-            "University Duration": "September 2023 – Present (Expected Graduation: June 2027)",
-            "University Major": "Bachelor of Science (Honours) in Hotel and Tourism Management, School of Hotel and Tourism Management",
-            "Coursework": "Focuses on business operations, consumer behavior, and strategic management in the hospitality sector",
-            "Uni Achievements": "Scholarship for Non-JUPAS Year 1 Recipient (2026), Dean's List (2024)",
-            "Uni Activities": "AIESEC in PolyU Outgoing Global Talent Member (2026-2027)",
-            "High School": "Queen's College, Hong Kong",
-            "HS Qualification": "Hong Kong Diploma of Secondary Education (HKDSE)",
-            "HS Achievements": "Head Prefect (2022), 1st Place in Inter-school Debate",
-            "Other Education": "Exchange Semester at University of Toronto (Fall 2025)",
-            "Exp 1 Company": "X Educational Center, Hong Kong (Phonics Tutor)",
-            "Exp 1 Date": "September 2025 to October 2026",
-            "Exp 1 Tasks": "Designed interactive lesson plans for 20+ students aged 5-7.",
-            "Languages": "English (Native), Cantonese (Fluent), Mandarin (Basic)",
-            "Tech Skills": "Canva, Microsoft Office, Python, MATLAB, Jupyter Notebook",
-            "Soft Skills": "Patient, Creative, Flexible, Cross-cultural communication",
-            "Hobbies": "Photography, Volunteering, Graphic Designing"
         };
 
         function initApp() {
